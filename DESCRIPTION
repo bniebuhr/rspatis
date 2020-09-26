@@ -1,0 +1,25 @@
+Package: spatis
+Title: Spatial Individual Specialization estimation in R
+Version: 0.0.0.9000
+Authors@R: 
+    c(person("Bernardo", "Niebuhr", role = c("aut", "cre"), 
+    email = "bernardo_brandaum@yahoo.com.br",
+    comment = c(ORCID = "0000-0002-0453-315X")),
+    person("Patricia", "Kerches-Rogeri", role = c("aut"), 
+    email = "parogeri@gmail.com"))
+Description: A collection of tools for measuring individual specialization in the use of 
+    space by organisms.
+License: GPL-2
+Depends:
+    R (>= 3.3.0)
+Imports:
+    sp,
+    sf,
+    magrittr,
+    dplyr,
+    adehabitatHR
+Suggests: knitr, rmarkdown, lubridate, ggplot2
+BugReports: https://github.com/bniebuhr/spatis/issues
+Encoding: UTF-8
+RoxygenNote: 6.1.1
+    
