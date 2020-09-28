@@ -1,12 +1,16 @@
 #' Movement data for Sturnira lilium bats
 #'
-#' Radiotelemetry movement data of S. lilium frugivorous bats in the state of Sao Paulo.
+#' Radiotelemetry movement data of \italic{S. lilium} frugivorous bats in the state of Sao Paulo.
 #'
 #' @usage
 #' data(bats)
 #' data(bats_sf)
+#' data(bats_sp)
 #'
-#' @format A data frame with 56,232 rows and 12 variables:
+#' @format Three objects based on the same data: \code{bats}, a data frame with the raw
+#' movement data; \code{bats_sf}, a spatial data frame of the class \code{\link{sf}};
+#' and \code{bats_sp}, a \code{\link{SpatialPointsDataFrame}}.
+#' These tables contain 767 rows and 7 variables:
 #' \describe{
 #'   \item{Tag_ID}{ID of radio collar}
 #'   \item{Animal_ID}{ID of the individual bat}
@@ -27,8 +31,6 @@
 #' @source What do we put here?
 #' @keywords data
 "bats"
-
-"bats_sf"
 
 
 

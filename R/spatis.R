@@ -1,14 +1,15 @@
-#' Calculation of Individual Specialization in the use of space from animal tracking
+#' Calculation of individual specialization in the use of space from animal tracking
 #'
 #' This function calculates utilization distributions (UD) for both
 #' the individuals and the whole (or rest of the) population, based on
 #' telemetry location points, and calculates both the Spatial Individual Specialization
-#' Index (`SpatIS`) and the Spatial Individual Complementary Specialization Index (SpatICS).
+#' Index (\code{SpatIS}) and the Spatial Individual Complementary Specialization
+#' Index (\code{SpatICS}).
 #' The individual SpatIS is calculated as the volume of the individual UD
-#' (or a X% kernel density estimation area, X defined by the user) that do
+#' (or a X\% kernel density estimation area, X defined by the user) that do
 #' not overlap with the populational UD (or a correspondent population KDE area).
 #' The individual SpatICS is calculated as the volume of the individual UD
-#' (or a X% KDE area, X defined by the user) that do
+#' (or a X\% KDE area, X defined by the user) that do
 #' not overlap with the UD of the rest of the population, after excluding that individual
 #' (or a correspondent KDE area of the rest of the population).
 #' The population SpatIS and SpatICS are the average of the the individual
@@ -37,39 +38,43 @@
 #' for the kernel estimation of the utilization distribution.
 #'
 #' @return The SpatIS function returns a list of six elements:
-#'  \item{data}{the data used to calculate SpatIS (with locations corresponding
+#' \item{data}{the data used to calculate SpatIS (with locations corresponding
 #'     to the whole population, independently of whether the population
 #'     locations were already in the input data). It is a SpatialPointsDataFrame.}
-#'  \item{parms}{a list with parameters used as input to call SpatIS function.}
-#'  \item{SpatIS.individual}{} a vector of Spatial individual specialization indices for
+#' \item{parms}{a list with parameters used as input to call SpatIS function.}
+#' \item{SpatIS.individual}{a vector of Spatial individual specialization indices for
 #'     each individual of the population (the overlap between
 #'     each individual and the population UDs).}
-#'  \item{SpatIS.population}{a value of Spatial individual specialization for the population,
+#' \item{SpatIS.population}{a value of Spatial individual specialization for the population,
 #'     calculated as the average of all SpatIS individual values.}
-#'  \item{SpatICS.individual}{a vector of Spatial individual complementary specialization
+#' \item{SpatICS.individual}{a vector of Spatial individual complementary specialization
 #'     indices for each individual of the population (the overlap between
 #'     each individual and the population UDs).}
-#'  \item{SpatICS.population}{a value of Spatial individual complementary specialization
+#' \item{SpatICS.population}{a value of Spatial individual complementary specialization
 #'     for the population, calculated as the average of all SpatICS individual values.}
 #'
-#'  @author Bernardo B. Niebuhr <bernardo_brandaum@yahoo.com.br> and Patricia Kerches-Rogeri
-#'  <parogeri@gmail.com>.
+#' @author Bernardo B. Niebuhr <bernardo_brandaum@yahoo.com.br> and Patricia Kerches-Rogeri
+#' <parogeri@gmail.com>.
 #'
-#'  @references
-#'  Kerches-Rogeri, P., Niebuhr, B.B., Muylaert, R.L, Mello, M.A.R.  Individual
-#'  specialization in the space use of frugivorous bats. Journal of Animal Ecology.
+#' @references
+#' Kerches-Rogeri, P., Niebuhr, B.B., Muylaert, R.L, Mello, M.A.R.  Individual
+#' specialization in the space use of frugivorous bats. Journal of Animal Ecology.
+#' Fieberg, J. and Kochanny, C.O. (2005) Quantifying home-range overlap: the importance of
+#' the utilization distribution. Journal of Wildlife Management, 69, 1346–1359.
 #'
-#'  @seealso [adehabitatHR::kernelUD()] for the estimation of utilization distributions, and
-#'  [adehabitatHR::kerneloverlap()] for the calculation of the overlap between utilization distributions or
-#'  areas of use.
+#' @seealso \code{\link[adehabitatHR]{kernelUD}} for the estimation of utilization distributions, and
+#' \code{\link[adehabitatHR]{kerneloverlap}} for the calculation of the overlap between utilization distributions or
+#' areas of use.
 #'
-#'  @export
+#' @example examples/spatis_example.R
+#'
+#' @export
 spatis <- function(data, individuals.col, population.ID = NULL, index = c("spatis", "spatics"),
                    method = c("VI", "HR", "PHR", "BA", "UDOI")[1], ...)
 {
   # Check if the data are of the class SpatialPoints
-  if (!inherits(data, "SpatialPoints"))
-    stop("Data should inherit the class SpatialPoints.")
+  if (!inherits(data, "SpatialPoints") & !("sf" %in% class(data)))
+    stop("Data should be a SpatialPointsDataFrame or a data frame of the class sf.")
 
   # Check if the method is valid
   available.methods = c("VI", "HR", "PHR", "BA", "UDOI")
@@ -77,8 +82,14 @@ spatis <- function(data, individuals.col, population.ID = NULL, index = c("spati
     stop(paste0("Argument 'method' should be one of the following options: ",
                 paste(available.methods, collapse = ", "), "."))
 
-  # Copying data and transforming ID values in character variables
-  data2 <- SpatialPointsDataFrame(data, data@data, match.ID = F)
+  # Copying data and transforming ID values into character variables
+  if(inherits(data, "SpatialPoints")) {
+    data2 <- SpatialPointsDataFrame(data, data@data, match.ID = F)
+  } else {
+    # if it an sf object
+    data2 <- as(data, "Spatial")
+    data2 <- SpatialPointsDataFrame(data2, data2@data, match.ID = F)
+  }
   data2[[individuals.col]] <- as.character(data2[[individuals.col]])
 
   if("spatis" %in% tolower(index)) {
@@ -104,13 +115,13 @@ spatis <- function(data, individuals.col, population.ID = NULL, index = c("spati
 
     # This is a matrix with the overlap of utilization distribution between each pair of individuals
     # and each individual and the whole population
-    over <- kerneloverlap(data.aux[,1], method = method, ...)
+    over <- kerneloverlap(data.aux[, individuals.col], method = method, ...)
 
     # Line in the overlap matrix that represents the population
     population.line <- which(rownames(over) == pop.ID)
 
     # Overlap of each individual with the whole population utilization distribution
-    SpatIS.ind.aux <- over[-population.line,population.line]
+    SpatIS.ind.aux <- over[-population.line, population.line]
     # SpatIS for individuals = 1 - overlap of the individual with the population
     SpatIS.ind <- 1 - SpatIS.ind.aux#spatis.calc(over = SpatIS.ind.aux, method = method)
     # SpatIS = average of individual SpatIS
@@ -129,7 +140,9 @@ spatis <- function(data, individuals.col, population.ID = NULL, index = c("spati
       remaining.inds[[individuals.col]] <- "remaining"
       data.aux <- rbind(ind1, remaining.inds)
 
-      over <- kerneloverlap(data.aux[,1], method = method, ...)[1,2]
+      if("sf" %in% class(data.aux)) data.aux <- as(data.aux, "Spatial")
+
+      over <- kerneloverlap(data.aux[, individuals.col], method = method, ...)[1,2]
       return(over)
     }
 

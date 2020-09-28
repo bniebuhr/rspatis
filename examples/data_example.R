@@ -1,22 +1,24 @@
 library(ggplot2)
+library(sf)
 
 # raw data table
 data(bats)
 bats
 
 # plot
-ggplot(bats_sf) +
-  geom_point(aes(x, y, color = as.factor(Animal_ID))) +
+ggplot(bats) +
+  geom_point(aes(x, y, color = Animal_ID)) +
   theme_minimal() +
   labs(color = "Animal_ID")
 
 # sf object
-data(bats_sf)
 bats_sf
 
 # plot
 ggplot(bats_sf) +
-  geom_sf(aes(color = as.factor(Animal_ID))
+  geom_sf(aes(color = Animal_ID)) +
   theme_minimal()
 
+# sp
+head(bats_sp)
 

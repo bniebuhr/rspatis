@@ -16,6 +16,6 @@ bats_sf <- bats %>%
 
 bats_sp <- as(bats_sf, "Spatial")
 
-save(bats, file = "data/bats.rda")
-save(bats_sf, file = "data/bats_sf.rda")
-save(bats_sp, file = "data/bats_sp.rda")
+save(bats, bats_sf, bats_sp, file = "data/bats.rda")
+# save(bats_sf, file = "data/bats_sf.rda")
+# save(bats_sp, file = "data/bats_sp.rda")
