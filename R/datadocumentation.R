@@ -1,6 +1,6 @@
 #' Movement data for Sturnira lilium bats
 #'
-#' Radiotelemetry movement data of \italic{S. lilium} frugivorous bats in the state of Sao Paulo.
+#' Radiotelemetry movement data of \emph{S. lilium} frugivorous bats in the state of Sao Paulo.
 #'
 #' @usage
 #' data(bats)
